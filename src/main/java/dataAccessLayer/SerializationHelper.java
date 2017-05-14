@@ -16,7 +16,11 @@ public class SerializationHelper {
     private static String accountFileName = "ser/account.ser";
     private static String personFileName = "ser/person.ser";
 
-
+    /**
+     *  Checks if there is existent file with specified name
+     * @param name
+     * @return true if there is a file, false otherwise
+     */
     public static boolean fileExists(String name){
         File file = new File(name);
         if(file.exists()){
@@ -25,6 +29,11 @@ public class SerializationHelper {
         return false;
     }
 
+
+    /**
+     *  Creates a new file with specified name if there is none existent
+     * @param name
+     */
     public static void createNewFile(String name){
 
         File file = new File(name);
@@ -35,6 +44,12 @@ public class SerializationHelper {
         }
     }
 
+
+    /**
+     *  Method used to store serialized data into specified file
+     * @param object
+     * @param fileName
+     */
     public static void writeIntoFile(Object object, String fileName){
 
         try {
@@ -53,6 +68,12 @@ public class SerializationHelper {
         }
     }
 
+
+    /**
+     *  Method used to retrieve and deserialize data from a specified file
+     * @param fileName
+     * @return
+     */
     public static Object readFromFile(String fileName){
         Object object = null;
 
@@ -77,6 +98,9 @@ public class SerializationHelper {
     }
 
 
+    /**
+     *  Method used for initialization of the storage files with predefined data
+     */
     public static void initializeFiles(){
         writeIntoFile(createPersonHashSet(), personFileName);
         writeIntoFile(createAccountsList(), accountFileName);
