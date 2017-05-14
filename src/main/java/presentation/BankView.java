@@ -1,5 +1,6 @@
 package presentation;
 
+import controller.BankController;
 import entities.Account;
 import entities.Person;
 import presentationUtils.AccountTableModel;
@@ -8,6 +9,7 @@ import presentationUtils.PersonTableModel;
 import sun.java2d.jules.JulesAATileGenerator;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.*;
@@ -51,6 +53,21 @@ public class BankView extends JFrame {
     private final JSplitPane accountInsideSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,accountInputPanel, accountButtonPanel);
     private final JSplitPane accountSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, accountScrollPane, accountInsideSplitPane);
 
+    private final JLabel accountIdLabel = new JLabel("Account id:");
+    private final JLabel accountNumberLabel = new JLabel("Account number:");
+    private final JLabel accountTypeLabel = new JLabel("Account type:");
+    private final JLabel accountBalanceLabel = new JLabel("Account balance:");
+    private final JLabel accountPersonIdLabel = new JLabel("Account person id:");
+    private final JTextField accountIdInput = new JTextField(30);
+    private final JTextField accountNumberInput = new JTextField(30);
+    private final JTextField accountTypeInput = new JTextField(30);
+    private final JTextField accountBalanceInput = new JTextField(30);
+    private final JTextField accountPersonIdInput = new JTextField(30);
+    private final JButton accountReadButton = new JButton("Read");
+    private final JButton accountAddButton = new JButton("Add");
+    private final JButton accountDeleteButton = new JButton("Delete");
+
+
     private final JPanel otherPanel = new JPanel();
     private final JButton initializeFilesButton = new JButton("Reinitialize storage files");
 
@@ -68,25 +85,66 @@ public class BankView extends JFrame {
     public String getPersonNameInput(){return personNameInput.getText();}
     public String getPersonAddressInput(){return personAddressInput.getText();}
 
+    public String getAccountIdInput(){return accountIdInput.getText();}
+    public String getAccountNumberInput(){return accountNumberInput.getText();}
+    public String getAccountTypeInput(){return accountTypeInput.getText();}
+    public String getAccountBalanceInput(){return accountBalanceInput.getText();}
+    public String getAccountPersonIdInput(){return accountPersonIdInput.getText();}
+
 
     public void addOtherButtonsListener(ActionListener actionListener){
         initializeFilesButton.addActionListener(actionListener);
     }
 
-    public void addPersonButtonsListener(ActionListener actionListener){
-        personReadButton.addActionListener(actionListener);
-        personAddButton.addActionListener(actionListener);
-        personDeleteButton.addActionListener(actionListener);
-        personReadButton.setActionCommand("read");
-        personAddButton.setActionCommand("add");
-        personDeleteButton.setActionCommand("delete");
+    public void addPersonButtonsListener(ActionListener listener){
+        addXButtonsListener(listener,personReadButton,personAddButton,personDeleteButton);
     }
 
+    public void addAccountButtonsListener(ActionListener listener){
+        addXButtonsListener(listener,accountReadButton,accountAddButton,accountDeleteButton);
+    }
+
+    public void addPersonTableSelectionListener(ListSelectionListener listSelectionListener){
+        personTable.getSelectionModel().addListSelectionListener(listSelectionListener);
+    }
+
+    public void addAccountTableSelectionListener(ListSelectionListener listSelectionListener){
+        accountTable.getSelectionModel().addListSelectionListener(listSelectionListener);
+    }
 
     public void updatePersonTable(List<Person> personList) {
         personTableModel.setDataVector(personList);
     }
 
+    public void updateAccountTable(List<Account> accountList) {
+        accountTableModel.setDataVector(accountList);
+    }
+
+    public String getSelectedPersonId() {
+        int row = personTable.getSelectedRow();
+        return row > -1 ? personTable.getValueAt(row,0).toString() : null;
+    }
+
+    public void updatePersonInputValues() {
+        int row = personTable.getSelectedRow();
+        if(row > -1 ){
+            personIdInput.setText(personTable.getValueAt(row,0).toString());
+            personPNCInput.setText(personTable.getValueAt(row,1).toString());
+            personNameInput.setText(personTable.getValueAt(row,2).toString());
+            personAddressInput.setText(personTable.getValueAt(row,3).toString());
+        }
+    }
+
+    public void updateAccountInputs() {
+        int row = accountTable.getSelectedRow();
+        if(row > -1){
+            accountIdInput.setText(accountTable.getValueAt(row,0).toString());
+            accountNumberInput.setText(accountTable.getValueAt(row,1).toString());
+            accountTypeInput.setText(accountTable.getValueAt(row,2).toString());
+            accountBalanceInput.setText(accountTable.getValueAt(row,3).toString());
+            accountPersonIdInput.setText(accountTable.getValueAt(row,4).toString());
+        }
+    }
 
     private void initializeFrame(){
 
@@ -125,11 +183,34 @@ public class BankView extends JFrame {
     private void setUpAccountPane(){
         accountTable.setModel(accountTableModel);
         accountSplitPane.setDividerLocation(300);
-
+        accountInputPanel.add(accountIdLabel);
+        accountInputPanel.add(accountIdInput);
+        accountInputPanel.add(accountNumberLabel);
+        accountInputPanel.add(accountNumberInput);
+        accountInputPanel.add(accountTypeLabel);
+        accountInputPanel.add(accountTypeInput);
+        accountInputPanel.add(accountBalanceLabel);
+        accountInputPanel.add(accountBalanceInput);
+        accountInputPanel.add(accountPersonIdLabel);
+        accountInputPanel.add(accountPersonIdInput);
+        accountButtonPanel.add(accountReadButton);
+        accountButtonPanel.add(accountAddButton);
+        accountButtonPanel.add(accountDeleteButton);
     }
 
     private void setUpOtherPanel(){
         otherPanel.add(initializeFilesButton);
+    }
+
+
+
+    private void addXButtonsListener(ActionListener actionListener, JButton readButton, JButton addButton, JButton deleteButton) {
+        readButton.addActionListener(actionListener);
+        addButton.addActionListener(actionListener);
+        deleteButton.addActionListener(actionListener);
+        readButton.setActionCommand("read");
+        addButton.setActionCommand("add");
+        deleteButton.setActionCommand("delete");
     }
 
     protected JPanel makeTextPanel() {

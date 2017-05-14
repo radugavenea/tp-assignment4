@@ -3,7 +3,6 @@ package dataAccessLayer;
 import entities.Account;
 import entities.Person;
 
-import javax.jnlp.PersistenceService;
 import java.io.*;
 import java.util.*;
 
@@ -13,8 +12,6 @@ import java.util.*;
 public class SerializationHelper {
 
     private static String bankFileName = "ser/bank.ser";
-    private static String accountFileName = "ser/account.ser";
-    private static String personFileName = "ser/person.ser";
 
     /**
      *  Checks if there is existent file with specified name
@@ -101,15 +98,26 @@ public class SerializationHelper {
     /**
      *  Method used for initialization of the storage files with predefined data
      */
-    public static void initializeFiles(){
-        writeIntoFile(createPersonHashSet(), personFileName);
-        writeIntoFile(createAccountsList(), accountFileName);
+//    public static void initializeFiles(String personFileName, String accountFileName){
+//        initializePersonFile(personFileName);
+//        initializeAccountFile(accountFileName);
+//        writeIntoFile(createBankHash(),bankFileName);
+//    }
+
+    public static void initializeBankFile(String bankFileName){
         writeIntoFile(createBankHash(),bankFileName);
     }
 
+//    public static void initializePersonFile(String personFileName){
+//        writeIntoFile(createPersonHashSet(), personFileName);
+//    }
+//    public static void initializeAccountFile(String accountFileName){
+//        writeIntoFile(createAccountsList(), accountFileName);
+//    }
+
 
     private static Set<Person> createPersonHashSet(){
-        HashSet<Person> personHashSet = new HashSet<Person>();
+        HashSet<Person> personHashSet = new HashSet<>();
         personHashSet.add(new Person(1,"11111111111", "Dorel Gigel", "Baritiu 26"));
         personHashSet.add(new Person(2,"22222222222", "Petunia Ghita", "Titulescu 234"));
         personHashSet.add(new Person(3,"23232323233", "Gigi", "la el acasa"));
@@ -119,7 +127,7 @@ public class SerializationHelper {
     }
 
     private static List<Account> createAccountsList(){
-        LinkedList<Account> accounts = new LinkedList<Account>();
+        LinkedList<Account> accounts = new LinkedList<>();
         accounts.add(new Account(1,"1234567890", "spending", 222.30,1));
         accounts.add(new Account(2,"5626535233", "saving", 123.00,2));
         accounts.add(new Account(3,"2343434888", "saving", 2355.35,4));
@@ -143,9 +151,9 @@ public class SerializationHelper {
         Set<Person> personHashSet = createPersonHashSet();
         List<Account> accounts = createAccountsList();
 
-        HashMap<Person,List<Account>> bankAccountsHash = new HashMap<Person, List<Account>>();
+        HashMap<Person,List<Account>> bankAccountsHash = new HashMap<>();
         for(Person p : personHashSet){
-            List<Account> personAccountsList = new LinkedList<Account>();
+            List<Account> personAccountsList = new LinkedList<>();
             for(Account a : accounts){
                 if(p.getId() == a.getPersonId()){
                     personAccountsList.add(a);

@@ -11,12 +11,13 @@ import java.util.Set;
  */
 public interface BankProc {
 
-    void reinitializeFiles();
+    void reinitializeBankFile(String bankFilePath);
     Set<Person> getAllPerson();
-    List<Account> getAllAccounts();
-    List<Account> getAllAccountsByPersonId(int id);
     List<Person> getMappedAllPerson();
     int addNewPerson(Person person);
     int deletePerson(Person person);
     int deletePersonById(int id);
+    List<Account> getAccountsByPersonId(int id);
+    int addNewAccount(Account account);
+    int deleteAccountById(int id);
 }
