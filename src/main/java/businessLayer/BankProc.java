@@ -5,6 +5,7 @@ import entities.Person;
 import entities.SavingAccount;
 
 import java.util.List;
+import java.util.Observer;
 import java.util.Set;
 
 /**
@@ -12,6 +13,7 @@ import java.util.Set;
  */
 public interface BankProc {
 
+    void addObserver(Observer o);
     void reinitializeBankFile(String bankFilePath);
     void saveIntoBankFile(String bankFilePath);
     Set<Person> getAllPerson();

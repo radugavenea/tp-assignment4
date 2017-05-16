@@ -297,4 +297,8 @@ public class BankView extends JFrame {
         JOptionPane.showMessageDialog(frame,"The transaction was successful. An interest of " + interest +
         " has been charged from your account");
     }
+
+    public void displayAccountModificationToPerson(String name) {
+        JOptionPane.showMessageDialog(frame,"Hey " + name + "! A transaction has been made to your account");
+    }
 }

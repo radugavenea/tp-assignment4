@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 /**
  * Created by radu on 12.05.2017.
  */
-public class Bank implements BankProc {
+public class Bank extends Observable implements BankProc {
 
     private BankHashMapDAO bankHashMapDAO;
     private Map<Person, List<Account>> bankHashMap;
@@ -59,6 +59,8 @@ public class Bank implements BankProc {
             }
         }
         bankHashMap.put(person,new LinkedList<>());
+        setChanged();
+        notifyObservers(person);
         return person.getId();
     }
 
@@ -69,6 +71,8 @@ public class Bank implements BankProc {
             bankHashMap.put(person, bankHashMap.get(lPerson));
             bankHashMap.remove(lPerson);
         }
+        setChanged();
+        notifyObservers(person);
         return person.getId();
     }
 
@@ -80,8 +84,11 @@ public class Bank implements BankProc {
     }
 
     @Override
-    public int deletePersonById(int id) {
+    public int deletePersonById(int id){
+        Person person = getPersonById(id);
         bankHashMap.entrySet().removeIf(entry -> entry.getKey().getId() == id);
+        setChanged();
+        notifyObservers(person);
         return id;
     }
 
@@ -95,11 +102,14 @@ public class Bank implements BankProc {
     public int addNewAccount(Account account) {
         List<Account> accountList = bankHashMap.get(getPersonById(account.getPersonId()));
         accountList.add(account);
+        setChanged();
+        notifyObservers(account);
         return account.getId();
     }
 
     @Override
     public int deleteAccountById(int id) {
+        Account account = getAccountById(id);
         for(List<Account> accountList : bankHashMap.values()){
             for(Iterator<Account> iterator = accountList.iterator(); iterator.hasNext();){
                 if(iterator.next().getId() == id){
@@ -107,6 +117,8 @@ public class Bank implements BankProc {
                 }
             }
         }
+        setChanged();
+        notifyObservers(account);
         return id;
     }
 
@@ -120,14 +132,16 @@ public class Bank implements BankProc {
     @Override
     public int addMoneyToAccount(double sum, int accountId) {
         Account account = getAccountById(accountId);
-
+        int returnedValue = 0;
         if(account instanceof SavingAccount){
-            return addToSavingAccount((SavingAccount) account,sum);
+            returnedValue = addToSavingAccount((SavingAccount) account,sum);
         }
         else if(account instanceof SpendingAccount) {
-            return addToSpendingAccount((SpendingAccount) account,sum);
+            returnedValue = addToSpendingAccount((SpendingAccount) account,sum);
         }
-        return 0;
+        setChanged();
+        notifyObservers(getPersonByAccountId(accountId).getName());
+        return returnedValue;
     }
 
     /**
@@ -142,18 +156,21 @@ public class Bank implements BankProc {
     @Override
     public int withdrawMoneyFromAccount(double sum, int accountId) {
         Account account = getAccountById(accountId);
-
+        int returnedValue = 0;
         if(account instanceof SavingAccount){
-            return withdrawFromSavingAccount((SavingAccount)account,sum);
+            returnedValue = withdrawFromSavingAccount((SavingAccount)account,sum);
         }
         else if(account instanceof SpendingAccount){
             if(((SpendingAccount) account).getLimit() < sum){
                 return -1;
             }
-            return withdrawFromSpendingAccount((SpendingAccount)account,sum);
+            returnedValue = withdrawFromSpendingAccount((SpendingAccount)account,sum);
         }
-        return 0;
+        setChanged();
+        notifyObservers(getPersonByAccountId(accountId).getName());
+        return returnedValue;
     }
+
 
     @Override
     public Person getPersonById(int id){
@@ -227,6 +244,15 @@ public class Bank implements BankProc {
         else {
             return -2;
         }
+    }
+
+
+    private Person getPersonByAccountId(int accountId) {
+        Person person = bankHashMap.entrySet().stream()
+                .filter(entry -> entry.getValue().contains(getAccountById(accountId)))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList()).get(0);
+        return person;
     }
 
 }

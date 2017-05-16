@@ -13,11 +13,13 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * Created by radu on 12.05.2017.
  */
-public class BankController {
+public class BankController implements Observer {
 
     int currentPersonId = -1;
     private String bankFilePath = "ser/bank.ser";
@@ -29,11 +31,25 @@ public class BankController {
         this.view = view;
         this.bankService = new Bank(new BankHashMapDAO(bankFilePath));
 
+        bankService.addObserver(this);
         view.addOtherButtonsListener(new OtherButtonsActionListener());
         view.addPersonButtonsListener(new PersonButtonsActionListener());
         view.addPersonTableSelectionListener(new PersonTableSelectionListener());
         view.addAccountButtonsListener(new AccountButtonsActionListener());
         view.addAccountTableSelectionListener(new AccountTableSelectionListener());
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        if(arg instanceof String){
+            view.displayAccountModificationToPerson((String) arg);
+        }
+        if(arg instanceof Account){
+            view.updateAccountTable(bankService.getAccountsByPersonId(currentPersonId));
+        }
+        else if(arg instanceof Person){
+            view.updatePersonTable(bankService.getMappedAllPerson());
+        }
     }
 
 
