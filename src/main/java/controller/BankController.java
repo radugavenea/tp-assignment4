@@ -1,6 +1,7 @@
 package controller;
 
 import businessLayer.Bank;
+import businessLayer.BankProc;
 import dataAccessLayer.BankHashMapDAO;
 import entities.Account;
 import entities.Person;
@@ -22,7 +23,7 @@ public class BankController {
     private String bankFilePath = "ser/bank.ser";
 
     private BankView view;
-    private Bank bankService;
+    private BankProc bankService;
 
     public BankController(BankView view) {
         this.view = view;
@@ -50,6 +51,13 @@ public class BankController {
                             view.getPersonNameInput(),
                             view.getPersonAddressInput()));
                     break;
+                case "edit":
+                    bankService.editPerson(new Person(
+                            Integer.parseInt(view.getPersonIdInput()),
+                            view.getPersonPNCInput(),
+                            view.getPersonNameInput(),
+                            view.getPersonAddressInput()));
+                    break;
                 case "delete":
                     bankService.deletePersonById(Integer.parseInt(view.getPersonIdInput()));
                     break;
@@ -64,6 +72,7 @@ public class BankController {
             if(view.getSelectedPersonId() != null){
                 currentPersonId = Integer.parseInt(view.getSelectedPersonId());
                 view.updatePersonInputValues();
+                view.updateAccountTable(bankService.getAccountsByPersonId(currentPersonId));
             }
         }
     }
@@ -113,6 +122,9 @@ public class BankController {
             Account account = bankService.getAccountById(Integer.parseInt(view.getAccountIdInput()));
             int returnedValue;
             switch (e.getActionCommand()){
+                case "save":
+                    bankService.saveIntoBankFile(bankFilePath);
+                    break;
                 case "init":
                     bankService.reinitializeBankFile(bankFilePath);
                     break;

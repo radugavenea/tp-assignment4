@@ -101,6 +101,9 @@ public class SerializationHelper {
         writeIntoFile(createBankHash(),bankFileName);
     }
 
+    public static void saveIntoBankFile(Map<Person, List<Account>> bankHashMap, String bankFileName) {
+        writeIntoFile(bankHashMap,bankFileName);
+    }
 
     private static Set<Person> createPersonHashSet(){
         HashSet<Person> personHashSet = new HashSet<>();

@@ -39,6 +39,7 @@ public class BankView extends JFrame {
     private final JTextField personAddressInput = new JTextField(30);
     private final JButton personReadButton = new JButton("Read");
     private final JButton personAddButton = new JButton("Add");
+    private final JButton personEditButton = new JButton("Edit");
     private final JButton personDeleteButton = new JButton("Delete");
 
 
@@ -62,19 +63,21 @@ public class BankView extends JFrame {
     private final JTextField accountPersonIdInput = new JTextField(30);
     private final JButton accountReadButton = new JButton("Read");
     private final JButton accountAddButton = new JButton("Add");
+    private final JButton accountEditButton = new JButton("Edit");
     private final JButton accountDeleteButton = new JButton("Delete");
 
 
     private final JPanel otherPanel = new JPanel();
-    private final JButton initializeFilesButton = new JButton("Reinitialize storage files");
+    private final JButton initializeFilesButton = new JButton("Reinitialize storage file");
+    private final JButton saveInFileButton = new JButton("Save into file");
     private final JLabel accountBalanceMoneyLabel = new JLabel("Your account balance: ");
-    private final JTextField accountBalanceMoneyInput = new JTextField(40);
+    private final JTextField accountBalanceMoneyInput = new JTextField(45);
     private final JLabel accountTypeMoneyLabel = new JLabel("  Your account type:   ");
-    private final JTextField accountTypeMoneyInput = new JTextField(40);
+    private final JTextField accountTypeMoneyInput = new JTextField(45);
     private final JLabel accountNumberMoneyLabel = new JLabel("Your account number: ");
-    private final JTextField accountNumberMoneyInput = new JTextField(40);
+    private final JTextField accountNumberMoneyInput = new JTextField(45);
     private final JLabel accountSumLabel = new JLabel("Add/Withdraw money");
-    private final JTextField accountSumInput = new JTextField(25);
+    private final JTextField accountSumInput = new JTextField(30);
     private final JButton accountAddMoneyButton = new JButton("Add");
     private final JButton accountWithdrawMoneyButton = new JButton("Withdraw");
 
@@ -124,6 +127,8 @@ public class BankView extends JFrame {
     public void addOtherButtonsListener(ActionListener actionListener){
         initializeFilesButton.addActionListener(actionListener);
         initializeFilesButton.setActionCommand("init");
+        saveInFileButton.addActionListener(actionListener);
+        saveInFileButton.setActionCommand("save");
         accountAddMoneyButton.addActionListener(actionListener);
         accountAddMoneyButton.setActionCommand("addMoney");
         accountWithdrawMoneyButton.addActionListener(actionListener);
@@ -131,11 +136,11 @@ public class BankView extends JFrame {
     }
 
     public void addPersonButtonsListener(ActionListener listener){
-        addXButtonsListener(listener,personReadButton,personAddButton,personDeleteButton);
+        addXButtonsListener(listener,personReadButton,personAddButton,personEditButton,personDeleteButton);
     }
 
     public void addAccountButtonsListener(ActionListener listener){
-        addXButtonsListener(listener,accountReadButton,accountAddButton,accountDeleteButton);
+        addXButtonsListener(listener,accountReadButton,accountAddButton,accountEditButton,accountDeleteButton);
     }
 
     public void addPersonTableSelectionListener(ListSelectionListener listSelectionListener){
@@ -204,6 +209,7 @@ public class BankView extends JFrame {
         personInputPanel.add(personAddressInput);
         personButtonPanel.add(personReadButton);
         personButtonPanel.add(personAddButton);
+        personButtonPanel.add(personEditButton);
         personButtonPanel.add(personDeleteButton);
     }
 
@@ -239,17 +245,21 @@ public class BankView extends JFrame {
         otherPanel.add(accountSumInput);
         otherPanel.add(accountAddMoneyButton);
         otherPanel.add(accountWithdrawMoneyButton);
+        otherPanel.add(saveInFileButton);
         otherPanel.add(initializeFilesButton);
     }
 
 
 
-    private void addXButtonsListener(ActionListener actionListener, JButton readButton, JButton addButton, JButton deleteButton) {
+    private void addXButtonsListener(ActionListener actionListener, JButton readButton, JButton addButton,
+                                     JButton editButton ,JButton deleteButton) {
         readButton.addActionListener(actionListener);
         addButton.addActionListener(actionListener);
+        editButton.addActionListener(actionListener);
         deleteButton.addActionListener(actionListener);
         readButton.setActionCommand("read");
         addButton.setActionCommand("add");
+        editButton.setActionCommand("edit");
         deleteButton.setActionCommand("delete");
     }
 

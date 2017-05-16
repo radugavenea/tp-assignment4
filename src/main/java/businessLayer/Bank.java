@@ -30,6 +30,11 @@ public class Bank implements BankProc {
     }
 
     @Override
+    public void saveIntoBankFile(String bankFilePath) {
+        SerializationHelper.saveIntoBankFile(bankHashMap,bankFilePath);
+    }
+
+    @Override
     public Set<Person> getAllPerson() {
         Set<Person> personSet = bankHashMap.keySet();
         return personSet;
@@ -48,7 +53,22 @@ public class Bank implements BankProc {
 
     @Override
     public int addNewPerson(Person person) {
+        for(Person p : bankHashMap.keySet()){
+            if(p.getId() == person.getId()){
+                return -1;
+            }
+        }
         bankHashMap.put(person,new LinkedList<>());
+        return person.getId();
+    }
+
+    @Override
+    public int editPerson(Person person) {
+        Person lPerson = getPersonById(person.getId());
+        if(lPerson != null){
+            bankHashMap.put(person, bankHashMap.get(lPerson));
+            bankHashMap.remove(lPerson);
+        }
         return person.getId();
     }
 
@@ -162,6 +182,10 @@ public class Bank implements BankProc {
     }
 
 
+    @Override
+    public double getInterestForSavingAccountDeposit(SavingAccount account,double sum){
+        return account.getDate() / 30.0 * (account.getInterest() / 100) * sum;
+    }
 
 
 
@@ -205,7 +229,4 @@ public class Bank implements BankProc {
         }
     }
 
-    public double getInterestForSavingAccountDeposit(SavingAccount account,double sum){
-        return account.getDate() / 30.0 * (account.getInterest() / 100) * sum;
-    }
 }
