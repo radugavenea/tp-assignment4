@@ -2,6 +2,8 @@ package dataAccessLayer;
 
 import entities.Account;
 import entities.Person;
+import entities.SavingAccount;
+import entities.SpendingAccount;
 
 import java.io.*;
 import java.util.*;
@@ -95,25 +97,9 @@ public class SerializationHelper {
     }
 
 
-    /**
-     *  Method used for initialization of the storage files with predefined data
-     */
-//    public static void initializeFiles(String personFileName, String accountFileName){
-//        initializePersonFile(personFileName);
-//        initializeAccountFile(accountFileName);
-//        writeIntoFile(createBankHash(),bankFileName);
-//    }
-
     public static void initializeBankFile(String bankFileName){
         writeIntoFile(createBankHash(),bankFileName);
     }
-
-//    public static void initializePersonFile(String personFileName){
-//        writeIntoFile(createPersonHashSet(), personFileName);
-//    }
-//    public static void initializeAccountFile(String accountFileName){
-//        writeIntoFile(createAccountsList(), accountFileName);
-//    }
 
 
     private static Set<Person> createPersonHashSet(){
@@ -128,20 +114,20 @@ public class SerializationHelper {
 
     private static List<Account> createAccountsList(){
         LinkedList<Account> accounts = new LinkedList<>();
-        accounts.add(new Account(1,"1234567890", "spending", 222.30,1));
-        accounts.add(new Account(2,"5626535233", "saving", 123.00,2));
-        accounts.add(new Account(3,"2343434888", "saving", 2355.35,4));
-        accounts.add(new Account(4,"1421424244", "spending", 333.30,3));
-        accounts.add(new Account(5,"2222343434", "spending", 422.45,1));
-        accounts.add(new Account(6,"5464656455", "saving", 2.35,2));
-        accounts.add(new Account(7,"8765434555", "saving", 7677.50,2));
-        accounts.add(new Account(8,"3455454333", "spending", 123.45,4));
-        accounts.add(new Account(9,"9876543333", "saving", 388.30,4));
-        accounts.add(new Account(10,"1323232345", "saving", 939.93,3));
-        accounts.add(new Account(11,"4567345562", "saving", 5453.30,2));
-        accounts.add(new Account(12,"8765444444", "spending", 22.55,4));
-        accounts.add(new Account(13,"3330020200", "spending", 30.50,3));
-        accounts.add(new Account(14,"1010001010", "spending", 100.00,2));
+        accounts.add(new SpendingAccount(1,"1234567890", "spending", 222.30,1,1000));
+        accounts.add(new SavingAccount(2,"5626535233", "saving", 123.00,2,10,3));
+        accounts.add(new SavingAccount(3,"2343434888", "saving", 2355.35,4,30,10));
+        accounts.add(new SpendingAccount(4,"1421424244", "spending", 333.30,3,3000));
+        accounts.add(new SpendingAccount(5,"2222343434", "spending", 422.45,1, 150));
+        accounts.add(new SavingAccount(6,"5464656455", "saving", 2.35,2,180,2));
+        accounts.add(new SavingAccount(7,"8765434555", "saving", 7677.50,2,54,5));
+        accounts.add(new SpendingAccount(8,"3455454333", "spending", 123.45,4,1150));
+        accounts.add(new SavingAccount(9,"9876543333", "saving", 388.30,4,234,3.4));
+        accounts.add(new SavingAccount(10,"1323232345", "saving", 939.93,3,120,5.5));
+        accounts.add(new SavingAccount(11,"4567345562", "saving", 5453.30,2,90,10.3));
+        accounts.add(new SpendingAccount(12,"8765444444", "spending", 22.55,4,800));
+        accounts.add(new SpendingAccount(13,"3330020200", "spending", 30.50,3,300));
+        accounts.add(new SpendingAccount(14,"1010001010", "spending", 100.00,2,1200));
 
         return accounts;
     }

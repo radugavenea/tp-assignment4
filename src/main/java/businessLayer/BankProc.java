@@ -20,4 +20,8 @@ public interface BankProc {
     List<Account> getAccountsByPersonId(int id);
     int addNewAccount(Account account);
     int deleteAccountById(int id);
+    int addMoneyToAccount(double sum, int accountId);
+    int withdrawMoneyFromAccount(double sum, int accountId);
+    Person getPersonById(int id);
+    Account getAccountById(int id);
 }

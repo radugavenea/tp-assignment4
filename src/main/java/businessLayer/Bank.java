@@ -4,6 +4,8 @@ import dataAccessLayer.BankHashMapDAO;
 import dataAccessLayer.SerializationHelper;
 import entities.Account;
 import entities.Person;
+import entities.SavingAccount;
+import entities.SpendingAccount;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -59,7 +61,7 @@ public class Bank implements BankProc {
 
     @Override
     public int deletePersonById(int id) {
-        bankHashMap.remove(getPersonById(id));
+        bankHashMap.entrySet().removeIf(entry -> entry.getKey().getId() == id);
         return id;
     }
 
@@ -68,34 +70,76 @@ public class Bank implements BankProc {
         return bankHashMap.get(getPersonById(id));
     }
 
+
     @Override
     public int addNewAccount(Account account) {
-        Person person = getPersonById(account.getPersonId());
-        List<Account> accountList = bankHashMap.get(person);
+        List<Account> accountList = bankHashMap.get(getPersonById(account.getPersonId()));
         accountList.add(account);
-        bankHashMap.put(person,accountList);
         return account.getId();
     }
 
     @Override
     public int deleteAccountById(int id) {
-        for(Person p : bankHashMap.keySet()){
-            List<Account> accountList = bankHashMap.get(p);
-            for(Account a : accountList){
-                if(a.getId() == id){
-                    accountList.remove(a);
+        for(List<Account> accountList : bankHashMap.values()){
+            for(Iterator<Account> iterator = accountList.iterator(); iterator.hasNext();){
+                if(iterator.next().getId() == id){
+                    iterator.remove();
                 }
             }
-            bankHashMap.put(p,accountList);
         }
         return id;
     }
 
+    /**
+     *  Method used to deposit money into an Account
+     * @param sum
+     * @param accountId
+     * @return  0 if transaction is successful
+     * @return -3 for Saving Account if its not the first deposit and transaction is not allowed
+     */
+    @Override
+    public int addMoneyToAccount(double sum, int accountId) {
+        Account account = getAccountById(accountId);
 
-    private Person getPersonById(int id){
+        if(account instanceof SavingAccount){
+            return addToSavingAccount((SavingAccount) account,sum);
+        }
+        else if(account instanceof SpendingAccount) {
+            return addToSpendingAccount((SpendingAccount) account,sum);
+        }
+        return 0;
+    }
+
+    /**
+     *  Method used to withdraw money from an Account
+     * @param sum
+     * @param accountId
+     * @return 0 if transaction is completed with success
+     * @return -1 for Spending Account if the sum to be withdraw is larger than the account limit
+     * @return -2 if there are not enough money in the account for the requested sum
+     * @return -3 for Saving Account if its not the first withdraw and transaction is not allowed
+     */
+    @Override
+    public int withdrawMoneyFromAccount(double sum, int accountId) {
+        Account account = getAccountById(accountId);
+
+        if(account instanceof SavingAccount){
+            return withdrawFromSavingAccount((SavingAccount)account,sum);
+        }
+        else if(account instanceof SpendingAccount){
+            if(((SpendingAccount) account).getLimit() < sum){
+                return -1;
+            }
+            return withdrawFromSpendingAccount((SpendingAccount)account,sum);
+        }
+        return 0;
+    }
+
+    @Override
+    public Person getPersonById(int id){
         try{
             return bankHashMap.keySet().stream()
-                    .filter(p -> p.getId() == id)
+                    .filter(e -> e.getId() == id)
                     .collect(Collectors.toList()).get(0);
         }
         catch (IndexOutOfBoundsException e){
@@ -103,7 +147,65 @@ public class Bank implements BankProc {
         }
     }
 
+    @Override
+    public Account getAccountById(int id){
+        Account account = null;
+        for(List<Account> accountList : bankHashMap.values()){
+            for(Iterator<Account> iterator = accountList.iterator(); iterator.hasNext(); ){
+                Account tempAccount = iterator.next();
+                if(tempAccount.getId() == id){
+                    account = tempAccount;
+                }
+            }
+        }
+        return account;
+    }
 
 
 
+
+
+    private int addToSavingAccount(SavingAccount account, double sum){
+        if(account.getIsFirstDeposit()){
+            double newBalance = account.getBalance() + sum - getInterestForSavingAccountDeposit(account,sum);
+            account.setBalance(newBalance);
+            account.setIsFirstDeposit(false);
+            return 0;
+        }
+        else return -3;
+    }
+
+    private int addToSpendingAccount(SpendingAccount account, double sum){
+        double newBalance = account.getBalance() + sum;
+        account.setBalance(newBalance);
+        return 0;
+    }
+
+    private int withdrawFromSavingAccount(SavingAccount account, double sum){
+        if(account.getIsFirstWithdraw()){
+            if(account.getBalance() >= sum){
+                double balance = account.getBalance() - sum;
+                account.setBalance(balance);
+                account.setIsFirstWithdraw(false);
+                return 0;
+            }
+            else return -2;
+        }
+        else return -3;
+    }
+
+    private int withdrawFromSpendingAccount(SpendingAccount account, double sum){
+        if(account.getBalance() >= sum){
+            double balance = account.getBalance() - sum;
+            account.setBalance(balance);
+            return 0;
+        }
+        else {
+            return -2;
+        }
+    }
+
+    public double getInterestForSavingAccountDeposit(SavingAccount account,double sum){
+        return account.getDate() / 30.0 * (account.getInterest() / 100) * sum;
+    }
 }

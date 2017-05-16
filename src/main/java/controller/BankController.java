@@ -4,6 +4,8 @@ import businessLayer.Bank;
 import dataAccessLayer.BankHashMapDAO;
 import entities.Account;
 import entities.Person;
+import entities.SavingAccount;
+import entities.SpendingAccount;
 import presentation.BankView;
 
 import javax.swing.event.ListSelectionEvent;
@@ -33,13 +35,6 @@ public class BankController {
         view.addAccountTableSelectionListener(new AccountTableSelectionListener());
     }
 
-
-    class OtherButtonsActionListener implements ActionListener{
-
-        public void actionPerformed(ActionEvent e) {
-            bankService.reinitializeBankFile(bankFilePath);
-        }
-    }
 
     class PersonButtonsActionListener implements ActionListener{
 
@@ -108,6 +103,65 @@ public class BankController {
         @Override
         public void valueChanged(ListSelectionEvent e) {
             view.updateAccountInputs();
+            view.updateOtherPanel();
+        }
+    }
+
+    class OtherButtonsActionListener implements ActionListener{
+
+        public void actionPerformed(ActionEvent e) {
+            Account account = bankService.getAccountById(Integer.parseInt(view.getAccountIdInput()));
+            int returnedValue;
+            switch (e.getActionCommand()){
+                case "init":
+                    bankService.reinitializeBankFile(bankFilePath);
+                    break;
+                case "addMoney":
+                    if(account instanceof SavingAccount && !((SavingAccount) account).getIsFirstDeposit()){
+                        view.displayOnlyOneDepositMessage();
+                    }
+                    returnedValue = bankService.addMoneyToAccount(Double.parseDouble(view.getAccountSumInput()),
+                            Integer.parseInt(view.getAccountIdInput()));
+
+                    displayCorrespondingDepositMessage(returnedValue,account);
+                    break;
+                case "withdraw":
+                    if(account instanceof SavingAccount && !((SavingAccount) account).getIsFirstWithdraw()){
+                        view.displayOnlyOneWithdrawMessage();
+                    }
+                    returnedValue = bankService.withdrawMoneyFromAccount(Double.parseDouble(view.getAccountSumInput()),
+                            Integer.parseInt(view.getAccountIdInput()));
+
+                    displayCorrespondingWithdrawMessage(returnedValue, account);
+                    break;
+            }
+        }
+    }
+
+
+
+    private void displayCorrespondingDepositMessage(int value, Account account){
+        if(value == 0){
+            if(account instanceof SpendingAccount){
+                view.displayTransactionSuccessfulMessage();
+            }
+            else if(account instanceof SavingAccount){
+                view.displaySavingAccountSuccessfulMessage(bankService.getInterestForSavingAccountDeposit(
+                        (SavingAccount) account,Double.parseDouble(view.getAccountSumInput())
+                ));
+            }
+        }
+    }
+
+    private void displayCorrespondingWithdrawMessage(int value, Account account){
+        if(value == 0){
+            view.displayTransactionSuccessfulMessage();
+        }
+        else if(value == -1 && account instanceof SpendingAccount){
+            view.displayWithdrawLimitMessage(Double.toString(((SpendingAccount) account).getLimit()));
+        }
+        else if(value == -2){
+            view.displayNotEnoughMoneyMessage();
         }
     }
 }

@@ -8,7 +8,7 @@ import java.io.Serializable;
 public class Person implements Serializable {
 
     private int id;
-    private String personalNumericalCode;     // personal numerical code
+    private String personalNumericalCode;
     private String name;
     private String address;
 
@@ -51,26 +51,5 @@ public class Person implements Serializable {
         this.address = address;
     }
 
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Person)) return false;
-
-        Person person = (Person) o;
-
-        if (getId() != person.getId()) return false;
-        if (getPersonalNumericalCode() != null ? !getPersonalNumericalCode().equals(person.getPersonalNumericalCode()) : person.getPersonalNumericalCode() != null) return false;
-        if (getName() != null ? !getName().equals(person.getName()) : person.getName() != null) return false;
-        return getAddress() != null ? getAddress().equals(person.getAddress()) : person.getAddress() == null;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = getId();
-        result = 31 * result + (getPersonalNumericalCode() != null ? getPersonalNumericalCode().hashCode() : 0);
-        result = 31 * result + (getName() != null ? getName().hashCode() : 0);
-        result = 31 * result + (getAddress() != null ? getAddress().hashCode() : 0);
-        return result;
-    }
 }
+

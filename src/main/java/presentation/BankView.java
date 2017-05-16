@@ -1,18 +1,15 @@
 package presentation;
 
-import controller.BankController;
 import entities.Account;
 import entities.Person;
 import presentationUtils.AccountTableModel;
 import presentationUtils.GenericTableModel;
 import presentationUtils.PersonTableModel;
-import sun.java2d.jules.JulesAATileGenerator;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionListener;
-import java.util.*;
 import java.util.List;
 
 /**
@@ -70,13 +67,41 @@ public class BankView extends JFrame {
 
     private final JPanel otherPanel = new JPanel();
     private final JButton initializeFilesButton = new JButton("Reinitialize storage files");
-
+    private final JLabel accountBalanceMoneyLabel = new JLabel("Your account balance: ");
+    private final JTextField accountBalanceMoneyInput = new JTextField(40);
+    private final JLabel accountTypeMoneyLabel = new JLabel("  Your account type:   ");
+    private final JTextField accountTypeMoneyInput = new JTextField(40);
+    private final JLabel accountNumberMoneyLabel = new JLabel("Your account number: ");
+    private final JTextField accountNumberMoneyInput = new JTextField(40);
+    private final JLabel accountSumLabel = new JLabel("Add/Withdraw money");
+    private final JTextField accountSumInput = new JTextField(25);
+    private final JButton accountAddMoneyButton = new JButton("Add");
+    private final JButton accountWithdrawMoneyButton = new JButton("Withdraw");
 
 
 
     public BankView() throws HeadlessException {
         initializeFrame();
         frame.setVisible(true);
+    }
+
+    private void initializeFrame(){
+
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setSize(new Dimension(800,600));
+        Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+        frame.setLocation((dimension.width - frame.getWidth()) /2, (dimension.height - frame.getHeight()) / 2);
+        frame.setResizable(false);
+
+        setUpPersonPanel();
+        setUpAccountPane();
+        setUpOtherPanel();
+
+        tabbedPane.add("People",personSplitPane);
+        tabbedPane.add("Accounts", accountSplitPane);
+        tabbedPane.add("Others", otherPanel);
+
+        frame.add(tabbedPane);
     }
 
 
@@ -90,10 +115,19 @@ public class BankView extends JFrame {
     public String getAccountTypeInput(){return accountTypeInput.getText();}
     public String getAccountBalanceInput(){return accountBalanceInput.getText();}
     public String getAccountPersonIdInput(){return accountPersonIdInput.getText();}
+    public String getAccountSumInput(){return accountSumInput.getText();}
+
+
+    public String getAccountOtherTypeInput(){return accountTypeMoneyInput.getText();}
 
 
     public void addOtherButtonsListener(ActionListener actionListener){
         initializeFilesButton.addActionListener(actionListener);
+        initializeFilesButton.setActionCommand("init");
+        accountAddMoneyButton.addActionListener(actionListener);
+        accountAddMoneyButton.setActionCommand("addMoney");
+        accountWithdrawMoneyButton.addActionListener(actionListener);
+        accountWithdrawMoneyButton.setActionCommand("withdraw");
     }
 
     public void addPersonButtonsListener(ActionListener listener){
@@ -120,11 +154,6 @@ public class BankView extends JFrame {
         accountTableModel.setDataVector(accountList);
     }
 
-    public String getSelectedPersonId() {
-        int row = personTable.getSelectedRow();
-        return row > -1 ? personTable.getValueAt(row,0).toString() : null;
-    }
-
     public void updatePersonInputValues() {
         int row = personTable.getSelectedRow();
         if(row > -1 ){
@@ -146,23 +175,21 @@ public class BankView extends JFrame {
         }
     }
 
-    private void initializeFrame(){
-
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setSize(new Dimension(800,600));
-        Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
-        frame.setLocation((dimension.width - frame.getWidth()) /2, (dimension.height - frame.getHeight()) / 2);
-
-        setUpPersonPanel();
-        setUpAccountPane();
-        setUpOtherPanel();
-
-        tabbedPane.add("People",personSplitPane);
-        tabbedPane.add("Accounts", accountSplitPane);
-        tabbedPane.add("Others", otherPanel);
-
-        frame.add(tabbedPane);
+    public void updateOtherPanel() {
+        int row = accountTable.getSelectedRow();
+        if(row > -1){
+            accountNumberMoneyInput.setText(accountTable.getValueAt(row,1).toString());
+            accountTypeMoneyInput.setText(accountTable.getValueAt(row,2).toString());
+            accountBalanceMoneyInput.setText(accountTable.getValueAt(row,3).toString());
+        }
     }
+
+
+    public String getSelectedPersonId() {
+        int row = personTable.getSelectedRow();
+        return row > -1 ? personTable.getValueAt(row,0).toString() : null;
+    }
+
 
     private void setUpPersonPanel(){
         personTable.setModel(personTableModel);
@@ -199,6 +226,19 @@ public class BankView extends JFrame {
     }
 
     private void setUpOtherPanel(){
+        otherPanel.add(accountNumberMoneyLabel);
+        accountNumberMoneyInput.setEditable(false);
+        otherPanel.add(accountNumberMoneyInput);
+        otherPanel.add(accountTypeMoneyLabel);
+        accountTypeMoneyInput.setEditable(false);
+        otherPanel.add(accountTypeMoneyInput);
+        otherPanel.add(accountBalanceMoneyLabel);
+        accountBalanceMoneyInput.setEditable(false);
+        otherPanel.add(accountBalanceMoneyInput);
+        otherPanel.add(accountSumLabel);
+        otherPanel.add(accountSumInput);
+        otherPanel.add(accountAddMoneyButton);
+        otherPanel.add(accountWithdrawMoneyButton);
         otherPanel.add(initializeFilesButton);
     }
 
@@ -213,10 +253,38 @@ public class BankView extends JFrame {
         deleteButton.setActionCommand("delete");
     }
 
-    protected JPanel makeTextPanel() {
+    private JPanel makeTextPanel() {
         JPanel panel = new JPanel(false);
         panel.setLayout(new GridLayout(0, 2));
         return panel;
     }
 
+    public void disableAddButton() {
+        accountAddMoneyButton.setEnabled(false);
+    }
+
+    public void displayOnlyOneDepositMessage() {
+        JOptionPane.showMessageDialog(frame,"Only one deposit is allowed to be made to a saving account");
+    }
+
+    public void displayOnlyOneWithdrawMessage() {
+        JOptionPane.showMessageDialog(frame,"Only one withdraw is allowed to be made from a saving account");
+    }
+
+    public void displayWithdrawLimitMessage(String limit) {
+        JOptionPane.showMessageDialog(frame,"You have a limit of " + limit + " per transaction");
+    }
+
+    public void displayNotEnoughMoneyMessage() {
+        JOptionPane.showMessageDialog(frame,"You have not enough money in your account");
+    }
+
+    public void displayTransactionSuccessfulMessage() {
+        JOptionPane.showMessageDialog(frame,"The transaction was successful");
+    }
+
+    public void displaySavingAccountSuccessfulMessage(double interest) {
+        JOptionPane.showMessageDialog(frame,"The transaction was successful. An interest of " + interest +
+        " has been charged from your account");
+    }
 }
