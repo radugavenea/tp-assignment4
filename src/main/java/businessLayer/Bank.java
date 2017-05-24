@@ -8,6 +8,7 @@ import entities.SavingAccount;
 import entities.SpendingAccount;
 
 import java.util.*;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
@@ -44,7 +45,8 @@ public class Bank extends Observable implements BankProc {
     public List<Person> getMappedAllPerson() {
         try{
             return getAllPerson().stream()
-                .collect(Collectors.toList());
+                    .sorted(Comparator.comparing(Person::getId))
+                    .collect(Collectors.toList());
         }
         catch (NullPointerException e){
             return null;
@@ -86,7 +88,8 @@ public class Bank extends Observable implements BankProc {
     @Override
     public int deletePersonById(int id){
         Person person = getPersonById(id);
-        bankHashMap.entrySet().removeIf(entry -> entry.getKey().getId() == id);
+        bankHashMap.entrySet()
+                .removeIf(entry -> entry.getKey().getId() == id);
         setChanged();
         notifyObservers(person);
         return id;
@@ -94,7 +97,13 @@ public class Bank extends Observable implements BankProc {
 
     @Override
     public List<Account> getAccountsByPersonId(int id) {
-        return bankHashMap.get(getPersonById(id));
+        return bankHashMap.entrySet().stream()
+                .filter(entry -> entry.getKey().getId() == id)
+                .map(value -> value.getValue())
+                .findFirst()
+                .get().stream()
+                .sorted(Comparator.comparing(Account::getId))
+                .collect(Collectors.toList());
     }
 
 
@@ -177,7 +186,8 @@ public class Bank extends Observable implements BankProc {
         try{
             return bankHashMap.keySet().stream()
                     .filter(e -> e.getId() == id)
-                    .collect(Collectors.toList()).get(0);
+                    .findFirst()
+                    .get();
         }
         catch (IndexOutOfBoundsException e){
             return null;
@@ -251,7 +261,8 @@ public class Bank extends Observable implements BankProc {
         Person person = bankHashMap.entrySet().stream()
                 .filter(entry -> entry.getValue().contains(getAccountById(accountId)))
                 .map(Map.Entry::getKey)
-                .collect(Collectors.toList()).get(0);
+                .findFirst()
+                .get();
         return person;
     }
 
