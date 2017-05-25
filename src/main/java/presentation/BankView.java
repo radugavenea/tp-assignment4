@@ -103,7 +103,7 @@ public class BankView extends JFrame {
 
         tabbedPane.add("People",personSplitPane);
         tabbedPane.add("Accounts", accountSplitPane);
-        tabbedPane.add("Others", otherPanel);
+        tabbedPane.add("Transactions", otherPanel);
 
         frame.add(tabbedPane);
     }
