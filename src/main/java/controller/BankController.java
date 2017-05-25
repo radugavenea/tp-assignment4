@@ -1,5 +1,6 @@
 package controller;
 
+import businessLayer.AccountValidation;
 import businessLayer.Bank;
 import businessLayer.BankProc;
 import dataAccessLayer.BankHashMapDAO;
@@ -24,12 +25,14 @@ public class BankController implements Observer {
     int currentPersonId = -1;
     private String bankFilePath = "ser/bank.ser";
 
+    private AccountValidation accountValidation;
     private BankView view;
     private BankProc bankService;
 
     public BankController(BankView view) {
         this.view = view;
         this.bankService = new Bank(new BankHashMapDAO(bankFilePath));
+        this.accountValidation = new AccountValidation();
 
         bankService.addObserver(this);
         view.addOtherButtonsListener(new OtherButtonsActionListener());
@@ -37,6 +40,7 @@ public class BankController implements Observer {
         view.addPersonTableSelectionListener(new PersonTableSelectionListener());
         view.addAccountButtonsListener(new AccountButtonsActionListener());
         view.addAccountTableSelectionListener(new AccountTableSelectionListener());
+        view.addInitializeButtonListener(new InitializeButtonListener());
     }
 
     @Override
@@ -61,11 +65,12 @@ public class BankController implements Observer {
                     view.updatePersonTable(bankService.getMappedAllPerson());
                     break;
                 case "add":
-                    bankService.addNewPerson(new Person(
-                            Integer.parseInt(view.getPersonIdInput()),
+                    Person person = new Person(
+                            bankService.getPersonLastId() + 1,
                             view.getPersonPNCInput(),
                             view.getPersonNameInput(),
-                            view.getPersonAddressInput()));
+                            view.getPersonAddressInput());
+                    bankService.addNewPerson(person);
                     break;
                 case "edit":
                     bankService.editPerson(new Person(
@@ -104,16 +109,18 @@ public class BankController implements Observer {
                     }
                     break;
                 case "add":
-                    if(Integer.parseInt(view.getAccountPersonIdInput()) == currentPersonId){
-                        bankService.addNewAccount(new Account(
-                                Integer.parseInt(view.getAccountIdInput()),
-                                view.getAccountNumberInput(),
-                                view.getAccountTypeInput(),
-                                Double.parseDouble(view.getAccountBalanceInput()),
-                                Integer.parseInt(view.getAccountPersonIdInput())));
+                    Account account = new Account(
+                            bankService.getAccountLastId() + 1,
+                            view.getAccountNumberInput(),
+                            view.getAccountTypeInput(),
+                            Double.parseDouble(view.getAccountBalanceInput()),
+                            Integer.parseInt(view.getAccountPersonIdInput()));
+                    if(accountValidation.isValid(account) &&
+                            Integer.parseInt(view.getAccountPersonIdInput()) == currentPersonId) {
+                        bankService.addNewAccount(account);
                     }
-                    else {
-                        //display error message
+                    else{
+                        view.displayAccountNotValidMessage();
                     }
                     break;
                 case "delete":
@@ -141,9 +148,6 @@ public class BankController implements Observer {
                 case "save":
                     bankService.saveIntoBankFile(bankFilePath);
                     break;
-                case "init":
-                    bankService.reinitializeBankFile(bankFilePath);
-                    break;
                 case "addMoney":
                     if(account instanceof SavingAccount && !((SavingAccount) account).getIsFirstDeposit()){
                         view.displayOnlyOneDepositMessage();
@@ -166,6 +170,13 @@ public class BankController implements Observer {
         }
     }
 
+    class InitializeButtonListener implements ActionListener{
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            bankService.reinitializeBankFile(bankFilePath);
+        }
+    }
 
 
     private void displayCorrespondingDepositMessage(int value, Account account){

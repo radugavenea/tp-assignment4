@@ -30,4 +30,6 @@ public interface BankProc {
     Person getPersonById(int id);
     Account getAccountById(int id);
     double getInterestForSavingAccountDeposit(SavingAccount account, double sum);
+    int getAccountLastId();
+    int getPersonLastId();
 }

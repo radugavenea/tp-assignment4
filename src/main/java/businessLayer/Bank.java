@@ -8,7 +8,6 @@ import entities.SavingAccount;
 import entities.SpendingAccount;
 
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
@@ -214,6 +213,30 @@ public class Bank extends Observable implements BankProc {
         return account.getDate() / 30.0 * (account.getInterest() / 100) * sum;
     }
 
+    @Override
+    public int getAccountLastId() {
+        try {
+            return bankHashMap.values().stream()
+                .flatMap(List::stream)
+                .map(Account::getId)
+                .max(Integer::compare)
+                .get();
+        } catch (NoSuchElementException e){
+            return 0;
+        }
+    }
+
+    @Override
+    public int getPersonLastId() {
+        try {
+            return bankHashMap.keySet().stream()
+                    .map(Person::getId)
+                    .max(Integer::compare)
+                    .get();
+        } catch (NoSuchElementException e){
+            return 0;
+        }
+    }
 
 
     private int addToSavingAccount(SavingAccount account, double sum){

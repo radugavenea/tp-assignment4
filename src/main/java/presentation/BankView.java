@@ -1,5 +1,6 @@
 package presentation;
 
+import controller.BankController;
 import entities.Account;
 import entities.Person;
 import presentationUtils.AccountTableModel;
@@ -125,14 +126,17 @@ public class BankView extends JFrame {
 
 
     public void addOtherButtonsListener(ActionListener actionListener){
-        initializeFilesButton.addActionListener(actionListener);
-        initializeFilesButton.setActionCommand("init");
         saveInFileButton.addActionListener(actionListener);
         saveInFileButton.setActionCommand("save");
         accountAddMoneyButton.addActionListener(actionListener);
         accountAddMoneyButton.setActionCommand("addMoney");
         accountWithdrawMoneyButton.addActionListener(actionListener);
         accountWithdrawMoneyButton.setActionCommand("withdraw");
+    }
+
+    public void addInitializeButtonListener(ActionListener listener) {
+        initializeFilesButton.addActionListener(listener);
+        initializeFilesButton.setActionCommand("init");
     }
 
     public void addPersonButtonsListener(ActionListener listener){
@@ -200,6 +204,7 @@ public class BankView extends JFrame {
         personTable.setModel(personTableModel);
         personSplitPane.setDividerLocation(300);
         personInputPanel.add(personIdLabel);
+        personIdInput.setEditable(false);
         personInputPanel.add(personIdInput);
         personInputPanel.add(personPNCLabel);
         personInputPanel.add(personPNCInput);
@@ -217,6 +222,7 @@ public class BankView extends JFrame {
         accountTable.setModel(accountTableModel);
         accountSplitPane.setDividerLocation(300);
         accountInputPanel.add(accountIdLabel);
+        accountIdInput.setEditable(false);
         accountInputPanel.add(accountIdInput);
         accountInputPanel.add(accountNumberLabel);
         accountInputPanel.add(accountNumberInput);
@@ -301,4 +307,9 @@ public class BankView extends JFrame {
     public void displayAccountModificationToPerson(String name) {
         JOptionPane.showMessageDialog(frame,"Hey " + name + "! A transaction has been made to your account");
     }
+
+    public void displayAccountNotValidMessage() {
+        JOptionPane.showMessageDialog(frame,"The information you have enter are not valid for a account");
+    }
+
 }
