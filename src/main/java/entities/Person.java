@@ -51,5 +51,27 @@ public class Person implements Serializable {
         this.address = address;
     }
 
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Person)) return false;
+
+        Person person = (Person) o;
+
+        if (getId() != person.getId()) return false;
+        if (!getPersonalNumericalCode().equals(person.getPersonalNumericalCode())) return false;
+        if (!getName().equals(person.getName())) return false;
+        return getAddress().equals(person.getAddress());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getId();
+        result = 31 * result + getPersonalNumericalCode().hashCode();
+        result = 31 * result + getName().hashCode();
+        result = 31 * result + getAddress().hashCode();
+        return result;
+    }
 }
 

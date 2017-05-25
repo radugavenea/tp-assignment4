@@ -62,4 +62,31 @@ public class Account implements Serializable {
         this.personId = personId;
     }
 
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Account)) return false;
+
+        Account account = (Account) o;
+
+        if (getId() != account.getId()) return false;
+        if (Double.compare(account.getBalance(), getBalance()) != 0) return false;
+        if (getPersonId() != account.getPersonId()) return false;
+        if (!getAccountNumber().equals(account.getAccountNumber())) return false;
+        return getType().equals(account.getType());
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        result = getId();
+        result = 31 * result + getAccountNumber().hashCode();
+        result = 31 * result + getType().hashCode();
+        temp = Double.doubleToLongBits(getBalance());
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + getPersonId();
+        return result;
+    }
 }
